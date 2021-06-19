@@ -10,6 +10,34 @@ var mouseDown = false;
 var activeToolElement = document.querySelector('[data-tool].active');
 var activeTool = activeToolElement.dataset.tool;
 
+const video = document.querySelector('.app video');
+video.style.display = "none";
+
+// Get media stream
+navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(function (stream) {
+        // Link to the video source
+        video.srcObject = stream;
+        // Play video
+        video.play();
+    })
+    .catch(function (err) {
+        console.log(`Error: ${err}`);
+    });
+
+    // Play when ready
+    video.addEventListener('canplay', function (e) {
+        webcamToCanvas(this, activeCtx, window.innerWidth, window.innerHeight);
+    }, false);
+    
+function webcamToCanvas(video, context, width, height){
+    // get the image data object
+    context.clearRect(0, 0, width, height);
+    context.globalAlpha = 0.5;
+    context.drawImage(video, 0, 0, width, height);
+    setTimeout(webcamToCanvas, 0, video, context, width, height)
+}
+
 document.querySelectorAll('[data-tool]').forEach(tool => {
     tool.onclick = function (e) {
         activeToolElement.classList.toggle('active');
